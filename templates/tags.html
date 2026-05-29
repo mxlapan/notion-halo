@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head('标签')}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('tags')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+    <div class="container">
+      <div class="page-head">
+        <span class="page-head__emoji">🏷️</span>
+        <h1 class="page-title">标签</h1>
+      </div>
+
+      <div class="tag-cloud" th:if="${tags != null and !tags.isEmpty()}"
+           th:with="palette=${ {'pill--blue','pill--green','pill--orange','pill--purple','pill--pink','pill--red'} }">
+        <a th:each="tag,iter : ${tags}"
+           class="pill"
+           th:classappend="${palette[iter.index % 6]}"
+           th:href="${tag.status.permalink}">
+          <span th:text="${tag.spec.displayName}">标签</span>
+          <span th:if="${tag.status != null}" th:text="${tag.status.postCount}">0</span>
+        </a>
+      </div>
+
+      <div class="empty" th:if="${tags == null or tags.isEmpty()}">
+        <span class="empty__emoji">🏷️</span>
+        <p>还没有任何标签</p>
+      </div>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

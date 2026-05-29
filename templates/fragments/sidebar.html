@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+  Left navigation column. Usage:
+    <aside th:replace="~{fragments/sidebar :: sidebar('index')}"></aside>
+  `active` = index | archives | categories | tags
+*/-->
+<aside th:fragment="sidebar(active)" id="sidebar" class="sidebar" data-sidebar>
+  <div class="sidebar__inner">
+
+    <!-- brand -->
+    <a class="sidebar__brand" href="/" th:with="avatar=${theme.config.header.avatar}">
+      <img class="sidebar__avatar" th:if="${!#strings.isEmpty(avatar)}"
+           th:src="${avatar}" th:alt="${site.title}" />
+      <img class="sidebar__avatar" th:if="${#strings.isEmpty(avatar) and !#strings.isEmpty(site.logo)}"
+           th:src="${site.logo}" th:alt="${site.title}" />
+      <span class="sidebar__avatar sidebar__avatar--emoji"
+            th:if="${#strings.isEmpty(avatar) and #strings.isEmpty(site.logo)}"
+            th:text="${!#strings.isEmpty(theme.config.header.site_emoji) ? theme.config.header.site_emoji : '📝'}">📝</span>
+      <span class="sidebar__title" th:text="${site.title}">站点标题</span>
+      <span class="sidebar__subtitle" th:if="${!#strings.isEmpty(site.subtitle)}"
+            th:text="${site.subtitle}">站点副标题</span>
+    </a>
+
+    <!-- navigation -->
+    <nav class="sidebar-nav" th:with="menu=${menuFinder.getPrimary()}">
+      <th:block th:if="${menu != null and menu.menuItems != null and !menu.menuItems.isEmpty()}">
+        <th:block th:each="item : ${menu.menuItems}">
+          <a class="sidebar-nav__link" th:href="${item.status.href}"
+             th:target="${item.spec.target != null ? item.spec.target.value : '_self'}">
+            <span class="sidebar-nav__icon">›</span>
+            <span th:text="${item.status.displayName}">菜单项</span>
+          </a>
+          <div class="sidebar-nav__sub" th:if="${item.children != null and !item.children.isEmpty()}">
+            <a th:each="child : ${item.children}" th:href="${child.status.href}"
+               th:target="${child.spec.target != null ? child.spec.target.value : '_self'}"
+               th:text="${child.status.displayName}">子菜单</a>
+          </div>
+        </th:block>
+      </th:block>
+
+      <th:block th:unless="${menu != null and menu.menuItems != null and !menu.menuItems.isEmpty()}">
+        <a class="sidebar-nav__link" href="/" th:classappend="${active == 'index'} ? 'is-active'">
+          <span class="sidebar-nav__icon">🏠</span><span>首页</span>
+        </a>
+        <a class="sidebar-nav__link" href="/categories" th:classappend="${active == 'categories'} ? 'is-active'">
+          <span class="sidebar-nav__icon">🗂️</span><span>分类</span>
+        </a>
+        <a class="sidebar-nav__link" href="/tags" th:classappend="${active == 'tags'} ? 'is-active'">
+          <span class="sidebar-nav__icon">🏷️</span><span>标签</span>
+        </a>
+        <a class="sidebar-nav__link" href="/archives" th:classappend="${active == 'archives'} ? 'is-active'">
+          <span class="sidebar-nav__icon">🗓️</span><span>归档</span>
+        </a>
+      </th:block>
+
+      <th:block th:if="${!#strings.isEmpty(theme.config.header.nav_extra)}"
+                th:utext="${theme.config.header.nav_extra}"></th:block>
+    </nav>
+
+    <!-- footer -->
+    <div class="sidebar__footer">
+      <div th:if="${!#strings.isEmpty(theme.config.footer.icp)}" style="margin-bottom:6px">
+        <a th:href="${theme.config.footer.icp_link}" target="_blank" rel="noopener"
+           th:text="${theme.config.footer.icp}">备案号</a>
+      </div>
+      <div class="sidebar__bottom">
+        <span class="sidebar__copyright" th:with="cr=${theme.config.footer.copyright}"
+              th:text="${!#strings.isEmpty(cr)} ? '© ' + ${#dates.year(#dates.createNow())} + ' ' + ${cr} : '© ' + ${#dates.year(#dates.createNow())} + ' ' + ${site.title}">
+          © 2026 站点标题
+        </span>
+        <a class="icon-btn sidebar__rss" href="/rss.xml" title="RSS" aria-label="RSS">📡</a>
+      </div>
+    </div>
+  </div>
+</aside>
+</body>
+</html>

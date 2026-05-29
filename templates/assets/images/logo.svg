@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="11" fill="#2383e2"/>
+  <!-- sails -->
+  <path d="M25 9v18h11L25 9z" fill="#ffffff"/>
+  <path d="M22 13L13 27h9V13z" fill="#ffffff" fill-opacity="0.82"/>
+  <!-- hull -->
+  <path d="M11 30h26l-3.5 6.5h-19L11 30z" fill="#ffffff"/>
+  <!-- water -->
+  <path d="M9 41c2.4 1.8 4.8 1.8 7.2 0s4.8-1.8 7.2 0 4.8 1.8 7.2 0 4.8-1.8 7.2 0"
+        stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-opacity="0.85"/>
+</svg>

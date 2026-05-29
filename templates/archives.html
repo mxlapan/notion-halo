@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head('归档')}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('archives')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+      <div class="container">
+      <div class="page-head">
+        <span class="page-head__emoji">🗓️</span>
+        <h1 class="page-title">归档</h1>
+        <p class="page-subtitle" th:if="${archives != null}"
+           th:text="'共 ' + ${archives.total} + ' 篇文章'">共 0 篇文章</p>
+      </div>
+
+      <th:block th:if="${archives != null and !archives.items.isEmpty()}">
+        <section th:each="archive : ${archives.items}">
+          <h2 class="archive-year" th:text="${archive.year}">2026</h2>
+          <th:block th:each="month : ${archive.months}">
+            <ul class="archive-list">
+              <li class="archive-item" th:each="post : ${month.posts}">
+                <span class="archive-item__date"
+                      th:text="${#temporals.format(post.spec.publishTime, 'MM-dd')}">05-29</span>
+                <a class="archive-item__title" th:href="${post.status.permalink}"
+                   th:text="${post.spec.title}">文章标题</a>
+              </li>
+            </ul>
+          </th:block>
+        </section>
+      </th:block>
+
+      <div class="empty" th:if="${archives == null or archives.items.isEmpty()}">
+        <span class="empty__emoji">🪶</span>
+        <p>还没有任何文章</p>
+      </div>
+
+      <nav th:replace="~{fragments/pagination :: pagination(${archives})}"></nav>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

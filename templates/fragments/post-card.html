@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+  A single post card (single-column list). Usage:
+    <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
+*/-->
+<article th:fragment="card(post)" class="post-card" th:attr="data-href=${post.status.permalink}">
+  <div class="post-card__body">
+    <h2 class="post-card__title">
+      <span class="pin" th:if="${post.spec.pinned}" title="置顶">📌</span>
+      <a th:href="${post.status.permalink}" th:text="${post.spec.title}">文章标题</a>
+    </h2>
+
+    <p class="post-card__excerpt"
+       th:if="${!#strings.isEmpty(post.status.excerpt)}"
+       th:text="${post.status.excerpt}">文章摘要……</p>
+
+    <div class="post-card__tags" th:if="${post.tags != null and !post.tags.isEmpty()}">
+      <a th:each="tag : ${post.tags}" class="pill pill--blue"
+         th:href="${tag.status.permalink}" th:text="${tag.spec.displayName}">标签</a>
+    </div>
+
+    <div class="meta" th:if="${theme.config.post.show_meta}">
+      <span class="meta__item" th:if="${post.spec.publishTime != null}"
+            th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}">2026-05-29</span>
+      <span class="meta__item" th:if="${post.categories != null and !post.categories.isEmpty()}">
+        <th:block th:each="cat,iter : ${post.categories}">
+          <a th:href="${cat.status.permalink}" th:text="${cat.spec.displayName}">分类</a><th:block th:if="${!iter.last}">,</th:block>
+        </th:block>
+      </span>
+      <span class="meta__item" th:if="${post.stats != null}">💬 <span th:text="${post.stats.comment ?: 0}">0</span></span>
+      <span class="meta__item" th:if="${post.stats != null}">👁 <span th:text="${post.stats.visit ?: 0}">0</span></span>
+    </div>
+  </div>
+
+  <img class="post-card__cover"
+       th:if="${theme.config.post.show_cover and !#strings.isEmpty(post.spec.cover)}"
+       th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy" />
+</article>
+</body>
+</html>

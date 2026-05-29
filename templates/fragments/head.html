@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--/*
+  Shared <head>. Usage from a page template:
+    <head th:replace="~{fragments/head :: head(${page_title})}"></head>
+  `page_title` is optional; pass null on the home page.
+*/-->
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(pageTitle)">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+  <meta name="renderer" content="webkit" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!--/* Avoid color-scheme flash: decide theme before first paint */-->
+  <script th:inline="javascript">
+    (function () {
+      var def = /*[[${theme.config.style.color_scheme}]]*/ "system";
+      var width = /*[[${theme.config.style.content_width}]]*/ "normal";
+      var saved = localStorage.getItem("notion-halo-scheme") || def;
+      var dark = saved === "dark" ||
+        (saved === "system" && window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+      var el = document.documentElement;
+      el.setAttribute("data-theme", dark ? "dark" : "light");
+      el.setAttribute("data-color-scheme", dark ? "dark" : "light");
+      el.setAttribute("data-default-scheme", def);
+      if (width === "wide") el.setAttribute("data-width", "wide");
+    })();
+  </script>
+
+  <title th:with="t=${pageTitle}" th:text="${t != null and !#strings.isEmpty(t)} ? |${t} - ${site.title}| : ${site.title}">站点标题</title>
+
+  <meta name="description"
+        th:with="desc=${post != null ? post.status.excerpt : (site.seo != null ? site.seo.description : null)}"
+        th:if="${desc != null and !#strings.isEmpty(desc)}"
+        th:content="${desc}" />
+  <meta name="keywords"
+        th:if="${site.seo != null and !#strings.isEmpty(site.seo.keywords)}"
+        th:content="${site.seo.keywords}" />
+
+  <!--/* favicon */-->
+  <link rel="icon" th:if="${!#strings.isEmpty(site.favicon)}" th:href="${site.favicon}" />
+  <link rel="icon" th:unless="${!#strings.isEmpty(site.favicon)}"
+        href="/themes/notion-halo/assets/images/logo.svg?v=1.0.0" type="image/svg+xml" />
+
+  <!--/* Open Graph */-->
+  <meta property="og:site_name" th:content="${site.title}" />
+  <meta property="og:title" th:content="${pageTitle != null ? pageTitle : site.title}" />
+  <meta property="og:type" content="website" />
+
+  <link rel="stylesheet" href="/themes/notion-halo/assets/css/style.css?v=1.0.0" />
+
+  <!--/* user-defined accent colour + custom css */-->
+  <th:block th:if="${!#strings.isEmpty(theme.config.style.accent_color)}">
+    <style th:inline="text">:root{--accent:[(${theme.config.style.accent_color})];}</style>
+  </th:block>
+  <th:block th:if="${!#strings.isEmpty(theme.config.code.custom_css)}">
+    <style th:utext="${theme.config.code.custom_css}"></style>
+  </th:block>
+
+  <!--/* global head injection from settings */-->
+  <th:block th:if="${!#strings.isEmpty(theme.config.code.global_head)}"
+            th:utext="${theme.config.code.global_head}"></th:block>
+
+  <script src="/themes/notion-halo/assets/js/theme.js?v=1.0.0" defer></script>
+  <!--/* Halo's GlobalHeadInjectionProcessor injects plugin assets before </head> automatically */-->
+</head>
+<body></body>
+</html>

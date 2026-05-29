@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head(${post.spec.title})}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+      <div class="container">
+
+      <img class="post-cover"
+           th:if="${!#strings.isEmpty(post.spec.cover)}"
+           th:src="${post.spec.cover}" th:alt="${post.spec.title}" />
+
+      <!-- title block -->
+      <div class="page-head">
+        <h1 class="page-title" th:text="${post.spec.title}">文章标题</h1>
+
+        <div class="meta" th:if="${theme.config.post.show_meta}" style="margin-top:14px">
+          <span class="meta__item" th:if="${post.categories != null and !post.categories.isEmpty()}">
+            📁
+            <th:block th:each="cat,iter : ${post.categories}">
+              <a th:href="${cat.status.permalink}" th:text="${cat.spec.displayName}">分类</a><th:block th:if="${!iter.last}">,</th:block>
+            </th:block>
+          </span>
+          <span class="meta__item" th:if="${post.spec.publishTime != null}">
+            📅 <span th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}">2026-05-29</span>
+          </span>
+          <span class="meta__item"
+                th:if="${theme.config.post.show_reading_time and post.content != null and post.content.content != null}"
+                th:with="mins=${post.content.content.length() / 800 + 1}">
+            ⏱ <span th:text="${mins} + ' 分钟阅读'">3 分钟阅读</span>
+          </span>
+          <span class="meta__item" th:if="${post.stats != null}">👁 <span th:text="${post.stats.visit}">0</span></span>
+        </div>
+      </div>
+
+      <!-- body + optional toc -->
+      <div class="post-layout" th:classappend="${theme.config.post.show_toc} ? 'has-toc'">
+        <article class="prose" data-prose th:utext="${post.content.content}">
+          <p>文章正文……</p>
+        </article>
+
+        <aside class="toc" data-toc data-toc-wrap th:if="${theme.config.post.show_toc}">
+          <p class="toc__title">目录</p>
+          <ul></ul>
+        </aside>
+      </div>
+
+      <!-- tags -->
+      <div class="post-tags" th:if="${post.tags != null and !post.tags.isEmpty()}">
+        <a th:each="tag : ${post.tags}" class="pill pill--blue"
+           th:href="${tag.status.permalink}" th:text="${tag.spec.displayName}">标签</a>
+      </div>
+
+      <!-- prev / next -->
+      <nav class="post-nav" th:with="cursor=${postFinder.cursor(post.metadata.name)}"
+           th:if="${cursor != null and (cursor.hasPrevious() or cursor.hasNext())}">
+        <a class="post-nav__item prev" th:if="${cursor.hasPrevious()}"
+           th:href="${cursor.previous.status.permalink}">
+          <div class="post-nav__label">← 上一篇</div>
+          <div class="post-nav__title" th:text="${cursor.previous.spec.title}">上一篇标题</div>
+        </a>
+        <span th:unless="${cursor.hasPrevious()}"></span>
+        <a class="post-nav__item next" th:if="${cursor.hasNext()}"
+           th:href="${cursor.next.status.permalink}">
+          <div class="post-nav__label">下一篇 →</div>
+          <div class="post-nav__title" th:text="${cursor.next.spec.title}">下一篇标题</div>
+        </a>
+      </nav>
+
+      <!-- comments -->
+      <section class="comment-section"
+               th:if="${theme.config.post.enable_comment}">
+        <h3 class="comment-section__title">评论</h3>
+        <halo:comment group="content.halo.run" kind="Post"
+                      th:attr="name=${post.metadata.name}"></halo:comment>
+      </section>
+
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

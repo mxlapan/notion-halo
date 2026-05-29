@@ -1,0 +1,20 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: notion-halo
+spec:
+  displayName: Notion
+  author:
+    name: mxlapan
+    website: https://github.com/mxlapan
+  description: 一款简洁、克制、专注于阅读的 Notion 风格 Halo 2 主题，支持浅色 / 深色模式。
+  logo: /themes/notion-halo/assets/images/logo.svg
+  website: https://github.com/mxlapan/notion-halo
+  repo: https://github.com/mxlapan/notion-halo
+  version: 1.0.0
+  require: ">=2.20.0"
+  settingName: notion-halo-settings
+  configMapName: notion-halo-configmap
+  license:
+    - name: GPL-3.0
+      url: https://github.com/mxlapan/notion-halo/blob/main/LICENSE

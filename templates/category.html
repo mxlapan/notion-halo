@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head(${category.spec.displayName})}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('categories')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+    <div class="container">
+      <div class="page-head">
+        <span class="page-head__emoji">🗂️</span>
+        <h1 class="page-title" th:text="${category.spec.displayName}">分类名</h1>
+        <p class="page-subtitle" th:if="${!#strings.isEmpty(category.spec.description)}"
+           th:text="${category.spec.description}">分类描述</p>
+        <p class="page-subtitle" th:if="${category.status != null}"
+           th:text="'共 ' + ${category.status.postCount} + ' 篇文章'">共 0 篇文章</p>
+      </div>
+
+      <div class="post-list" th:if="${posts != null and !posts.items.isEmpty()}">
+        <th:block th:each="post : ${posts.items}">
+          <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
+        </th:block>
+      </div>
+
+      <div class="empty" th:if="${posts == null or posts.items.isEmpty()}">
+        <span class="empty__emoji">🪶</span>
+        <p>该分类下还没有文章</p>
+      </div>
+
+      <nav th:replace="~{fragments/pagination :: pagination(${posts})}"></nav>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

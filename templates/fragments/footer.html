@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+  Main-column footer: only renders when the user provides custom footer HTML
+  or a global footer injection (e.g. analytics).
+*/-->
+<footer th:fragment="footer" class="site-footer"
+        th:if="${!#strings.isEmpty(theme.config.footer.footer_html) or !#strings.isEmpty(theme.config.code.global_footer)}">
+  <div class="site-footer__inner" th:if="${!#strings.isEmpty(theme.config.footer.footer_html)}"
+       th:utext="${theme.config.footer.footer_html}"></div>
+  <th:block th:if="${!#strings.isEmpty(theme.config.code.global_footer)}"
+            th:utext="${theme.config.code.global_footer}"></th:block>
+</footer>
+</body>
+</html>

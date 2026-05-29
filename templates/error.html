@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head('出错了')}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+      <div class="container">
+      <div class="error-page">
+        <p class="error-page__code" th:text="${status != null ? status : '404'}">404</p>
+        <p class="error-page__msg"
+           th:text="${status == 404 ? '页面走丢了，它可能已被移动或删除。' : (error != null ? error : '服务器开了个小差，请稍后再试。')}">
+          页面走丢了。
+        </p>
+        <a class="btn" href="/">← 返回首页</a>
+      </div>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

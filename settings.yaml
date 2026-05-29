@@ -1,0 +1,124 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: notion-halo-settings
+spec:
+  forms:
+    - group: style
+      label: 外观
+      formSchema:
+        - $formkit: select
+          name: color_scheme
+          label: 默认配色模式
+          value: "system"
+          help: 访客可在站点右上角手动切换，此处为默认值。
+          options:
+            - label: 跟随系统
+              value: "system"
+            - label: 浅色
+              value: "light"
+            - label: 深色
+              value: "dark"
+        - $formkit: checkbox
+          name: enable_scheme_switch
+          label: 显示配色切换按钮
+          value: true
+        - $formkit: select
+          name: font_family
+          label: 正文字体
+          value: "sans"
+          options:
+            - label: 无衬线（默认）
+              value: "sans"
+            - label: 衬线（阅读感更强）
+              value: "serif"
+        - $formkit: text
+          name: accent_color
+          label: 强调色
+          value: "#2383e2"
+          help: 用于链接、按钮等强调元素，需为合法 CSS 颜色值。
+        - $formkit: select
+          name: content_width
+          label: 列表内容宽度
+          value: "normal"
+          options:
+            - label: 标准（≤1250px）
+              value: "normal"
+            - label: 宽（≤1450px）
+              value: "wide"
+    - group: header
+      label: 侧栏与导航
+      formSchema:
+        - $formkit: attachment
+          name: avatar
+          label: 侧栏头像（个人头像）
+          help: 显示在左侧栏顶部，独立于站点 Logo。留空则使用站点 Logo，再留空则用下方 Emoji。
+        - $formkit: text
+          name: site_emoji
+          label: 站点 Emoji 图标
+          value: "📝"
+          help: 没有头像 / Logo 时作为占位，并显示在移动端顶栏站点名前。
+        - $formkit: code
+          name: nav_extra
+          label: 额外导航链接（HTML）
+          language: html
+          help: 追加到侧栏导航末尾，例如指向外部站点的链接。
+    - group: post
+      label: 文章
+      formSchema:
+        - $formkit: checkbox
+          name: show_cover
+          label: 列表中显示封面图
+          value: true
+        - $formkit: checkbox
+          name: show_reading_time
+          label: 显示预计阅读时间
+          value: true
+        - $formkit: checkbox
+          name: show_toc
+          label: 文章页显示目录
+          value: true
+        - $formkit: checkbox
+          name: show_meta
+          label: 显示文章元信息（作者 / 日期 / 分类）
+          value: true
+        - $formkit: checkbox
+          name: enable_comment
+          label: 启用评论
+          value: true
+          help: 需安装「评论组件」插件后生效。
+    - group: footer
+      label: 页脚
+      formSchema:
+        - $formkit: text
+          name: copyright
+          label: 版权信息
+          value: ""
+          help: 留空则使用站点标题。
+        - $formkit: text
+          name: icp
+          label: 备案号
+          value: ""
+        - $formkit: text
+          name: icp_link
+          label: 备案号链接
+          value: "https://beian.miit.gov.cn"
+        - $formkit: code
+          name: footer_html
+          label: 自定义页脚（HTML）
+          language: html
+    - group: code
+      label: 代码注入
+      formSchema:
+        - $formkit: code
+          name: custom_css
+          label: 自定义 CSS
+          language: css
+        - $formkit: code
+          name: global_head
+          label: 全局 head 注入
+          language: html
+        - $formkit: code
+          name: global_footer
+          label: 全局 footer 注入
+          language: html

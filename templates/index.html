@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head(null)}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('index')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+    <div class="container">
+      <div class="page-head">
+        <h1 class="page-title" th:text="${site.title}">站点标题</h1>
+        <p class="page-subtitle" th:if="${!#strings.isEmpty(site.subtitle)}"
+           th:text="${site.subtitle}">站点副标题</p>
+      </div>
+
+      <p class="section-label">最新文章</p>
+
+      <div class="post-list" th:if="${posts != null and !posts.items.isEmpty()}">
+        <th:block th:each="post : ${posts.items}">
+          <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
+        </th:block>
+      </div>
+
+      <div class="empty" th:if="${posts == null or posts.items.isEmpty()}">
+        <span class="empty__emoji">🪶</span>
+        <p>还没有任何文章</p>
+      </div>
+
+      <nav th:replace="~{fragments/pagination :: pagination(${posts})}"></nav>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

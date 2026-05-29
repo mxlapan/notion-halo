@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+  Top bar inside the main column. Usage:
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+  Hamburger + brand show only below the `lg` breakpoint (sidebar hidden);
+  search / scheme / admin entry sit on the right. Icons use emoji (Notion style).
+*/-->
+<header th:fragment="topbar" class="topbar">
+  <button class="icon-btn topbar__menu-btn" data-sidebar-toggle type="button" aria-label="打开侧栏">☰</button>
+
+  <a class="topbar__brand" href="/">
+    <span class="topbar__emoji" th:if="${!#strings.isEmpty(theme.config.header.site_emoji)}"
+          th:text="${theme.config.header.site_emoji}">📝</span>
+    <span th:text="${site.title}">站点标题</span>
+  </a>
+
+  <span class="topbar__spacer"></span>
+
+  <button th:if="${pluginFinder.available('PluginSearchWidget')}"
+          class="icon-btn" type="button" onclick="SearchWidget.open()" title="搜索" aria-label="搜索">🔍</button>
+
+  <button th:if="${theme.config.style.enable_scheme_switch}"
+          class="icon-btn" data-scheme-toggle type="button" aria-label="切换配色">
+    <span class="icon-moon">🌙</span>
+    <span class="icon-sun">☀️</span>
+  </button>
+
+  <a class="icon-btn login-entry" data-login-entry href="/console" title="登录" aria-label="登录">
+    <span class="icon-login">🔑</span>
+    <span class="icon-console">⚙️</span>
+  </a>
+</header>
+</body>
+</html>

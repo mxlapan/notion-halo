@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+  Pagination bar. Usage:
+    <nav th:replace="~{fragments/pagination :: pagination(${posts})}"></nav>
+  Expects a Halo ListResult with hasPrevious/hasNext/prevUrl/nextUrl/page/totalPages.
+*/-->
+<nav th:fragment="pagination(posts)" class="pagination"
+     th:if="${posts != null and posts.totalPages > 1}">
+  <a class="page-btn"
+     th:classappend="${!posts.hasPrevious} ? 'is-disabled'"
+     th:href="${posts.hasPrevious} ? @{${posts.prevUrl}} : '#'">
+    <span>←</span><span>上一页</span>
+  </a>
+
+  <span class="page-info" th:text="${posts.page} + ' / ' + ${posts.totalPages}">1 / 3</span>
+
+  <a class="page-btn"
+     th:classappend="${!posts.hasNext} ? 'is-disabled'"
+     th:href="${posts.hasNext} ? @{${posts.nextUrl}} : '#'">
+    <span>下一页</span><span>→</span>
+  </a>
+</nav>
+</body>
+</html>

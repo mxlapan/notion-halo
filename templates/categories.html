@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head('分类')}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('categories')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+    <div class="container">
+      <div class="page-head">
+        <span class="page-head__emoji">🗂️</span>
+        <h1 class="page-title">分类</h1>
+      </div>
+
+      <div class="card-grid" th:if="${categories != null and !categories.isEmpty()}">
+        <a class="card" th:each="cat : ${categories}" th:href="${cat.status.permalink}">
+          <p class="card__title" th:text="${cat.spec.displayName}">分类名</p>
+          <p class="card__desc" th:if="${!#strings.isEmpty(cat.spec.description)}"
+             th:text="${cat.spec.description}">分类描述</p>
+          <p class="card__count" th:text="${cat.status.postCount} + ' 篇文章'">0 篇文章</p>
+        </a>
+      </div>
+
+      <div class="empty" th:if="${categories == null or categories.isEmpty()}">
+        <span class="empty__emoji">🗂️</span>
+        <p>还没有任何分类</p>
+      </div>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>

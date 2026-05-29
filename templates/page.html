@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:halo="https://halo.run">
+<head th:replace="~{fragments/head :: head(${singlePage.spec.title})}"></head>
+<body th:attr="data-font=${theme.config.style.font_family}">
+  <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+  <div class="sidebar-mask" data-sidebar-mask></div>
+
+  <div class="main-wrapper">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="site-main">
+      <div class="container">
+      <div class="page-head">
+        <h1 class="page-title" th:text="${singlePage.spec.title}">页面标题</h1>
+        <div class="meta" th:if="${singlePage.spec.publishTime != null}" style="margin-top:12px">
+          <span class="meta__item"
+                th:text="${#temporals.format(singlePage.spec.publishTime, 'yyyy-MM-dd')}">2026-05-29</span>
+          <span class="meta__item" th:if="${singlePage.stats != null}">👁 <span th:text="${singlePage.stats.visit}">0</span></span>
+        </div>
+      </div>
+
+      <article class="prose" data-prose th:utext="${singlePage.content.content}">
+        <p>页面正文……</p>
+      </article>
+
+      <section class="comment-section" th:if="${theme.config.post.enable_comment}">
+        <h3 class="comment-section__title">评论</h3>
+        <halo:comment group="content.halo.run" kind="SinglePage"
+                      th:attr="name=${singlePage.metadata.name}"></halo:comment>
+      </section>
+    </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+  </div>
+</body>
+</html>
