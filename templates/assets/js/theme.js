@@ -167,6 +167,9 @@
       var wrap = toc.closest("[data-toc-wrap]");
       if (wrap) wrap.style.display = "none";
       else toc.style.display = "none";
+      // no headings → drop the TOC rail so the body stays centered
+      var layout = document.querySelector(".post-grid");
+      if (layout) layout.classList.remove("has-toc");
       return;
     }
     headings.forEach(function (h, i) {

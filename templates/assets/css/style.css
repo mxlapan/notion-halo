@@ -6,8 +6,11 @@
 
 :root {
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
-    "Segoe UI Symbol";
+    Helvetica, Arial,
+    /* CJK: pick a quality Chinese sans before falling back to the OS default */
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "WenQuanYi Micro Hei",
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --font-serif: Lyon-Text, Georgia, ui-serif, "Songti SC", "Noto Serif CJK SC",
     serif;
   --font-mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", "Courier New",
@@ -41,7 +44,6 @@
   --sidebar-width: 260px;
   --topbar-height: 56px;
   --content-width: 1250px;
-  --panel-width: 230px;
 
   /* Notion block accent colors */
   --c-gray: rgba(120, 119, 116, 0.16);
@@ -612,20 +614,45 @@ html[data-theme="dark"] .icon-moon {
   margin-bottom: 28px;
   background: var(--block-bg);
 }
-.post-layout {
+/* Post reading shell.
+   The body is fluid: it fills the available page area (capped by the shared
+   --content-width and centered with scaling side padding), so its width is
+   computed from the viewport. The TOC is NOT part of this flow — it floats as a
+   fixed overlay (see below) and never affects the article width. */
+.post-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 56px;
+  align-items: start;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: clamp(18px, 4vw, 40px);
+}
+.post-col {
+  min-width: 0;
 }
 
+/* =========================================================================
+   Floating outline (Notion-style page outline)
+   Collapsed → a stack of small right-edge bars, one per heading.
+   On hover → expands into a text panel that floats over the right margin.
+   Fixed to the viewport, so it never steals width from the article body.
+   ========================================================================= */
 .toc {
-  position: sticky;
-  top: calc(var(--topbar-height) + 28px);
-  align-self: start;
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: none; /* revealed ≥ xl when the article has a TOC */
+  width: 56px; /* collapsed: just wide enough for the bars */
+  max-height: 74vh;
+  padding: 10px 12px;
+  overflow: hidden;
+  border-radius: 12px;
   font-size: 13px;
-  max-height: calc(100vh - var(--topbar-height) - 60px);
-  overflow-y: auto;
-  display: none; /* shown ≥ xl via media query */
+  background: transparent;
+  box-shadow: none;
+  transition: width 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
 }
 .toc__title {
   font-size: 12px;
@@ -634,41 +661,83 @@ html[data-theme="dark"] .icon-moon {
   text-transform: uppercase;
   color: var(--text-tertiary);
   margin: 0 0 10px;
+  opacity: 0; /* hidden while collapsed */
+  transition: opacity 0.16s ease;
 }
 .toc ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+.toc li {
+  display: flex;
+  justify-content: flex-end; /* bars hug the right edge while collapsed */
+}
+
+/* ---- collapsed: each heading rendered as a small bar ---- */
 .toc a {
   display: block;
+  height: 2px;
+  width: 22px;
+  margin: 9px 0;
+  border-radius: 2px;
+  background: var(--border-strong);
+  color: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-indent: 200%;
+  transition: width 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+}
+.toc .lvl-3 { width: 14px; }
+.toc .lvl-4 { width: 10px; }
+.toc a.is-active { background: var(--accent); width: 30px; }
+.toc .lvl-3.is-active { width: 22px; }
+.toc .lvl-4.is-active { width: 18px; }
+
+/* ---- expanded on hover: real text panel floating over the content ---- */
+.toc:hover {
+  width: 264px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+}
+.toc:hover .toc__title { opacity: 1; }
+.toc:hover li { justify-content: flex-start; }
+.toc:hover a {
+  height: auto;
+  width: auto;
+  margin: 0;
   padding: 4px 10px;
-  border-left: 2px solid transparent;
+  border-radius: var(--radius);
+  background: none;
   color: var(--text-secondary);
   line-height: 1.4;
-  transition: color 0.12s ease, border-color 0.12s ease;
+  text-indent: 0;
 }
-.toc a:hover {
+.toc:hover .lvl-3 { padding-left: 22px; }
+.toc:hover .lvl-4 { padding-left: 34px; }
+.toc:hover a:hover {
   color: var(--text);
+  background: var(--hover);
 }
-.toc a.is-active {
+.toc:hover a.is-active {
   color: var(--accent);
-  border-left-color: var(--accent);
+  background: var(--hover);
+  font-weight: 500;
 }
-.toc .lvl-3 { padding-left: 22px; }
-.toc .lvl-4 { padding-left: 34px; }
 
 /* =========================================================================
    Prose (rendered article body)
    ========================================================================= */
 .prose {
   font-size: 16px;
-  line-height: 1.75;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
   color: var(--text);
   word-wrap: break-word;
 }
 .prose > *:first-child { margin-top: 0; }
-.prose p { margin: 0 0 0.6em; }
+.prose p { margin: 0 0 1.2em; text-align: justify; }
 .prose h1,
 .prose h2,
 .prose h3,
@@ -1156,12 +1225,10 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   }
 }
 
-/* ≥ xl (1200px): reveal the right TOC panel on posts */
+/* ≥ xl: reveal the floating outline (only when the article actually has a TOC).
+   The body width is unaffected — the outline floats over the right margin. */
 @media (min-width: 1200px) {
-  .post-layout.has-toc {
-    grid-template-columns: minmax(0, 1fr) var(--panel-width);
-  }
-  .post-layout.has-toc .toc {
+  .post-grid.has-toc > .toc {
     display: block;
   }
 }

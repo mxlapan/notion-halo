@@ -97,9 +97,9 @@
   <!--/* favicon */-->
   <link rel="icon" th:if="${!#strings.isEmpty(site.favicon)}" th:href="${site.favicon}" />
   <link rel="icon" th:unless="${!#strings.isEmpty(site.favicon)}"
-        href="/themes/notion-halo/assets/images/logo.svg?v=1.0.1" type="image/svg+xml" />
+        href="/themes/notion-halo/assets/images/logo.svg?v=1.0.2" type="image/svg+xml" />
 
-  <link rel="stylesheet" href="/themes/notion-halo/assets/css/style.css?v=1.0.1" />
+  <link rel="stylesheet" href="/themes/notion-halo/assets/css/style.css?v=1.0.2" />
 
   <!--/* user-defined accent colour + custom css */-->
   <th:block th:if="${!#strings.isEmpty(theme.config.style.accent_color)}">
@@ -113,7 +113,7 @@
   <th:block th:if="${!#strings.isEmpty(theme.config.code.global_head)}"
             th:utext="${theme.config.code.global_head}"></th:block>
 
-  <script src="/themes/notion-halo/assets/js/theme.js?v=1.0.1" defer></script>
+  <script src="/themes/notion-halo/assets/js/theme.js?v=1.0.2" defer></script>
   <!--/* Halo's GlobalHeadInjectionProcessor injects plugin assets before </head> automatically */-->
 </head>
 <body></body>

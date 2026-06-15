@@ -9,7 +9,16 @@
     <header th:replace="~{fragments/topbar :: topbar}"></header>
 
     <main class="site-main">
-      <div class="container">
+      <!-- 3-column reading shell: gutter | centered content | TOC rail.
+           has-toc is added only when the article actually contains headings,
+           so heading-less posts still center cleanly with no empty rail. -->
+      <div class="post-grid"
+           th:classappend="${theme.config.post.show_toc
+                            and post.content != null and post.content.content != null
+                            and (#strings.contains(post.content.content, '&lt;h2')
+                                 or #strings.contains(post.content.content, '&lt;h3')
+                                 or #strings.contains(post.content.content, '&lt;h4'))} ? 'has-toc'">
+      <div class="post-col">
 
       <img class="post-cover"
            th:if="${!#strings.isEmpty(post.spec.cover)}"
@@ -38,17 +47,10 @@
         </div>
       </div>
 
-      <!-- body + optional toc -->
-      <div class="post-layout" th:classappend="${theme.config.post.show_toc} ? 'has-toc'">
-        <article class="prose" data-prose th:utext="${post.content.content}">
-          <p>文章正文……</p>
-        </article>
-
-        <aside class="toc" data-toc data-toc-wrap th:if="${theme.config.post.show_toc}">
-          <p class="toc__title">目录</p>
-          <ul></ul>
-        </aside>
-      </div>
+      <!-- article body -->
+      <article class="prose" data-prose th:utext="${post.content.content}">
+        <p>文章正文……</p>
+      </article>
 
       <!-- tags (left) + share (right) -->
       <div class="post-actions"
@@ -138,7 +140,15 @@
                       th:attr="name=${post.metadata.name}"></halo:comment>
       </section>
 
-    </div>
+      </div><!-- /.post-col -->
+
+      <!-- TOC rail: sits in the right gutter, sticky; never squeezes the body -->
+      <aside class="toc" data-toc data-toc-wrap th:if="${theme.config.post.show_toc}">
+        <p class="toc__title">目录</p>
+        <ul></ul>
+      </aside>
+
+    </div><!-- /.post-grid -->
     </main>
 
     <footer th:replace="~{fragments/footer :: footer}"></footer>
