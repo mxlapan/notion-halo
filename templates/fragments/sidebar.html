@@ -23,14 +23,38 @@
             th:text="${site.subtitle}">站点副标题</span>
     </a>
 
+    <!-- epigraph (站点题记) -->
+    <blockquote class="sidebar__epigraph" th:if="${!#strings.isEmpty(theme.config.header.epigraph)}">
+      <p th:utext="${theme.config.header.epigraph}">题记……</p>
+      <cite th:if="${!#strings.isEmpty(theme.config.header.epigraph_source)}"
+            th:text="${theme.config.header.epigraph_source}">—— 出处</cite>
+    </blockquote>
+
     <!-- navigation -->
     <nav class="sidebar-nav" th:with="menu=${menuFinder.getPrimary()}">
+      <!-- 默认导航：始终显示 -->
+      <a class="sidebar-nav__link" href="/" th:classappend="${active == 'index'} ? 'is-active'">
+        <span class="sidebar-nav__icon">🏠</span><span>首页</span>
+      </a>
+      <a class="sidebar-nav__link" href="/categories" th:classappend="${active == 'categories'} ? 'is-active'">
+        <span class="sidebar-nav__icon">🗂️</span><span>分类</span>
+      </a>
+      <a class="sidebar-nav__link" href="/tags" th:classappend="${active == 'tags'} ? 'is-active'">
+        <span class="sidebar-nav__icon">🏷️</span><span>标签</span>
+      </a>
+      <a class="sidebar-nav__link" href="/archives" th:classappend="${active == 'archives'} ? 'is-active'">
+        <span class="sidebar-nav__icon">🗓️</span><span>归档</span>
+      </a>
+
+      <!-- 自定义主菜单：追加在默认导航之后，支持二级菜单 -->
       <th:block th:if="${menu != null and menu.menuItems != null and !menu.menuItems.isEmpty()}">
         <th:block th:each="item : ${menu.menuItems}">
           <a class="sidebar-nav__link" th:href="${item.status.href}"
-             th:target="${item.spec.target != null ? item.spec.target.value : '_self'}">
-            <span class="sidebar-nav__icon">›</span>
-            <span th:text="${item.status.displayName}">菜单项</span>
+             th:target="${item.spec.target != null ? item.spec.target.value : '_self'}"
+             th:with="dn=${item.status.displayName},hasIcon=${dn != null and dn.contains(' ')}">
+            <span class="sidebar-nav__icon"
+                  th:text="${hasIcon ? #strings.substringBefore(dn, ' ') : '›'}">›</span>
+            <span th:text="${hasIcon ? #strings.substringAfter(dn, ' ') : dn}">菜单项</span>
           </a>
           <div class="sidebar-nav__sub" th:if="${item.children != null and !item.children.isEmpty()}">
             <a th:each="child : ${item.children}" th:href="${child.status.href}"
@@ -38,21 +62,6 @@
                th:text="${child.status.displayName}">子菜单</a>
           </div>
         </th:block>
-      </th:block>
-
-      <th:block th:unless="${menu != null and menu.menuItems != null and !menu.menuItems.isEmpty()}">
-        <a class="sidebar-nav__link" href="/" th:classappend="${active == 'index'} ? 'is-active'">
-          <span class="sidebar-nav__icon">🏠</span><span>首页</span>
-        </a>
-        <a class="sidebar-nav__link" href="/categories" th:classappend="${active == 'categories'} ? 'is-active'">
-          <span class="sidebar-nav__icon">🗂️</span><span>分类</span>
-        </a>
-        <a class="sidebar-nav__link" href="/tags" th:classappend="${active == 'tags'} ? 'is-active'">
-          <span class="sidebar-nav__icon">🏷️</span><span>标签</span>
-        </a>
-        <a class="sidebar-nav__link" href="/archives" th:classappend="${active == 'archives'} ? 'is-active'">
-          <span class="sidebar-nav__icon">🗓️</span><span>归档</span>
-        </a>
       </th:block>
 
       <th:block th:if="${!#strings.isEmpty(theme.config.header.nav_extra)}"

@@ -32,7 +32,7 @@
           <span class="meta__item"
                 th:if="${theme.config.post.show_reading_time and post.content != null and post.content.content != null}"
                 th:with="mins=${post.content.content.length() / 800 + 1}">
-            ⏱ <span th:text="${mins} + ' 分钟阅读'">3 分钟阅读</span>
+            ⏱ <span data-reading-time th:text="${mins} + ' 分钟阅读'">3 分钟阅读</span>
           </span>
           <span class="meta__item" th:if="${post.stats != null}">👁 <span th:text="${post.stats.visit}">0</span></span>
         </div>
@@ -50,11 +50,69 @@
         </aside>
       </div>
 
-      <!-- tags -->
-      <div class="post-tags" th:if="${post.tags != null and !post.tags.isEmpty()}">
-        <a th:each="tag : ${post.tags}" class="pill pill--blue"
-           th:href="${tag.status.permalink}" th:text="${tag.spec.displayName}">标签</a>
+      <!-- tags (left) + share (right) -->
+      <div class="post-actions"
+           th:with="shareUrl=${site.url != null and !#strings.isEmpty(site.url) ? site.url + post.status.permalink : post.status.permalink},
+                    shareTitle=${post.spec.title}">
+        <div class="post-tags" th:if="${post.tags != null and !post.tags.isEmpty()}">
+          <a th:each="tag : ${post.tags}" class="pill pill--blue"
+             th:href="${tag.status.permalink}" th:text="${tag.spec.displayName}">标签</a>
+        </div>
+        <div class="post-share">
+          <span class="post-share__label">分享</span>
+          <button class="post-share__btn" type="button" data-share-copy
+                  th:attr="data-url=${shareUrl}" title="复制链接" aria-label="复制链接">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </button>
+          <a class="post-share__btn" target="_blank" rel="noopener noreferrer"
+             title="分享到 X" aria-label="分享到 X"
+             th:href="@{https://twitter.com/intent/tweet(url=${shareUrl},text=${shareTitle})}">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
       </div>
+
+      <!-- copyright / license -->
+      <aside class="post-copyright"
+             th:if="${theme.config.post.show_copyright}"
+             th:with="fullUrl=${site.url != null and !#strings.isEmpty(site.url) ? site.url + post.status.permalink : post.status.permalink}">
+        <div class="post-copyright__row">
+          <span class="post-copyright__label">本文标题</span>
+          <span class="post-copyright__value" th:text="${post.spec.title}">文章标题</span>
+        </div>
+        <div class="post-copyright__row">
+          <span class="post-copyright__label">本文链接</span>
+          <a class="post-copyright__value post-copyright__link" th:href="${fullUrl}" th:text="${fullUrl}">链接</a>
+        </div>
+        <div class="post-copyright__row" th:if="${!#strings.isEmpty(theme.config.post.copyright_notice)}">
+          <span class="post-copyright__label">版权声明</span>
+          <span class="post-copyright__value" th:text="${theme.config.post.copyright_notice}">版权说明</span>
+        </div>
+      </aside>
+
+      <!-- related posts: other posts from the same primary category -->
+      <th:block th:if="${theme.config.post.show_related and post.categories != null and !post.categories.isEmpty()}"
+                th:with="related=${postFinder.listByCategory(1, 4, post.categories[0].metadata.name).items}">
+        <section class="related" th:if="${related != null and related.size() > 1}">
+          <h3 class="related__title">相关文章</h3>
+          <div class="related__grid">
+            <th:block th:each="rp : ${related}">
+              <a th:if="${rp.metadata.name != post.metadata.name}"
+                 class="related__card" th:href="${rp.status.permalink}">
+                <span class="related__name" th:text="${rp.spec.title}">相关文章标题</span>
+                <span class="related__date" th:if="${rp.spec.publishTime != null}"
+                      th:text="${#temporals.format(rp.spec.publishTime, 'yyyy-MM-dd')}">2026-01-01</span>
+              </a>
+            </th:block>
+          </div>
+        </section>
+      </th:block>
 
       <!-- prev / next -->
       <nav class="post-nav" th:with="cursor=${postFinder.cursor(post.metadata.name)}"

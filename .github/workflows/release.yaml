@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release theme
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Package theme
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^  version: .*/  version: ${VERSION}/" theme.yaml
+          zip -r "notion-halo-${GITHUB_REF_NAME}.zip" \
+            theme.yaml settings.yaml templates README.md LICENSE
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: notion-halo-*.zip
+          generate_release_notes: true

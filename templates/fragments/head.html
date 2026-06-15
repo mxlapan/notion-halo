@@ -30,25 +30,76 @@
 
   <title th:with="t=${pageTitle}" th:text="${t != null and !#strings.isEmpty(t)} ? |${t} - ${site.title}| : ${site.title}">站点标题</title>
 
-  <meta name="description"
-        th:with="desc=${post != null ? post.status.excerpt : (site.seo != null ? site.seo.description : null)}"
-        th:if="${desc != null and !#strings.isEmpty(desc)}"
-        th:content="${desc}" />
-  <meta name="keywords"
-        th:if="${site.seo != null and !#strings.isEmpty(site.seo.keywords)}"
-        th:content="${site.seo.keywords}" />
+  <!--/*
+    SEO building blocks. We resolve a few shared values once and reuse them for
+    <meta description>, Open Graph, Twitter cards, canonical link and JSON-LD.
+  */-->
+  <th:block th:with="
+        siteUrl=${site.url != null ? site.url : ''},
+        permalink=${post != null ? post.status.permalink
+                     : (singlePage != null ? singlePage.status.permalink
+                     : (category != null ? category.status.permalink
+                     : (tag != null ? tag.status.permalink : '')))},
+        rawDesc=${post != null ? post.status.excerpt
+                   : (singlePage != null ? singlePage.status.excerpt
+                   : (site.seo != null ? site.seo.description : null))},
+        rawCover=${post != null and !#strings.isEmpty(post.spec.cover) ? post.spec.cover
+                    : (!#strings.isEmpty(site.logo) ? site.logo
+                    : '/themes/notion-halo/assets/images/logo.svg')}">
+
+    <th:block th:with="
+          pageUrl=${#strings.isEmpty(permalink) ? siteUrl
+                     : (permalink.startsWith('http') ? permalink : siteUrl + permalink)},
+          ogImage=${rawCover.startsWith('http') ? rawCover
+                     : (#strings.isEmpty(siteUrl) ? rawCover : siteUrl + rawCover)},
+          ogTitle=${pageTitle != null and !#strings.isEmpty(pageTitle) ? pageTitle : site.title}">
+
+      <meta name="description" th:if="${rawDesc != null and !#strings.isEmpty(rawDesc)}" th:content="${rawDesc}" />
+      <meta name="keywords"
+            th:if="${site.seo != null and !#strings.isEmpty(site.seo.keywords)}"
+            th:content="${site.seo.keywords}" />
+      <link rel="canonical" th:if="${!#strings.isEmpty(pageUrl)}" th:href="${pageUrl}" />
+
+      <!--/* Open Graph */-->
+      <meta property="og:site_name" th:content="${site.title}" />
+      <meta property="og:title" th:content="${ogTitle}" />
+      <meta property="og:type" th:content="${post != null ? 'article' : 'website'}" />
+      <meta property="og:url" th:if="${!#strings.isEmpty(pageUrl)}" th:content="${pageUrl}" />
+      <meta property="og:image" th:if="${!#strings.isEmpty(ogImage)}" th:content="${ogImage}" />
+      <meta property="og:description" th:if="${rawDesc != null and !#strings.isEmpty(rawDesc)}" th:content="${rawDesc}" />
+      <meta property="article:published_time"
+            th:if="${post != null and post.spec.publishTime != null}"
+            th:content="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd''T''HH:mm:ssXXX')}" />
+
+      <!--/* Twitter card */-->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" th:content="${ogTitle}" />
+      <meta name="twitter:description" th:if="${rawDesc != null and !#strings.isEmpty(rawDesc)}" th:content="${rawDesc}" />
+      <meta name="twitter:image" th:if="${!#strings.isEmpty(ogImage)}" th:content="${ogImage}" />
+
+      <!--/* JSON-LD structured data for posts */-->
+      <script th:if="${post != null}" type="application/ld+json" th:inline="javascript">
+      {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": [[${post.spec.title}]],
+        "description": [[${rawDesc != null ? rawDesc : ''}]],
+        "image": [[${ogImage}]],
+        "url": [[${pageUrl}]],
+        "datePublished": [[${post.spec.publishTime != null ? #temporals.format(post.spec.publishTime, 'yyyy-MM-dd''T''HH:mm:ssXXX') : ''}]],
+        "author": { "@type": "Person", "name": [[${post.owner != null ? post.owner.displayName : site.title}]] },
+        "publisher": { "@type": "Organization", "name": [[${site.title}]] }
+      }
+      </script>
+    </th:block>
+  </th:block>
 
   <!--/* favicon */-->
   <link rel="icon" th:if="${!#strings.isEmpty(site.favicon)}" th:href="${site.favicon}" />
   <link rel="icon" th:unless="${!#strings.isEmpty(site.favicon)}"
-        href="/themes/notion-halo/assets/images/logo.svg?v=1.0.0" type="image/svg+xml" />
+        href="/themes/notion-halo/assets/images/logo.svg?v=1.0.1" type="image/svg+xml" />
 
-  <!--/* Open Graph */-->
-  <meta property="og:site_name" th:content="${site.title}" />
-  <meta property="og:title" th:content="${pageTitle != null ? pageTitle : site.title}" />
-  <meta property="og:type" content="website" />
-
-  <link rel="stylesheet" href="/themes/notion-halo/assets/css/style.css?v=1.0.0" />
+  <link rel="stylesheet" href="/themes/notion-halo/assets/css/style.css?v=1.0.1" />
 
   <!--/* user-defined accent colour + custom css */-->
   <th:block th:if="${!#strings.isEmpty(theme.config.style.accent_color)}">
@@ -62,7 +113,7 @@
   <th:block th:if="${!#strings.isEmpty(theme.config.code.global_head)}"
             th:utext="${theme.config.code.global_head}"></th:block>
 
-  <script src="/themes/notion-halo/assets/js/theme.js?v=1.0.0" defer></script>
+  <script src="/themes/notion-halo/assets/js/theme.js?v=1.0.1" defer></script>
   <!--/* Halo's GlobalHeadInjectionProcessor injects plugin assets before </head> automatically */-->
 </head>
 <body></body>

@@ -2,7 +2,8 @@
    - color scheme switching (light / dark / system) with persistence
    - mobile navigation toggle
    - table-of-contents scroll spy
-   - copy-to-clipboard buttons on code blocks
+   - code blocks: language label + copy-to-clipboard
+   - accurate reading time, back-to-top, image lightbox
    ========================================================================= */
 (function () {
   "use strict";
@@ -180,26 +181,128 @@
     });
   }
 
-  /* ---- copy buttons on code blocks ------------------------------------ */
-  function bindCodeCopy() {
+  /* ---- code blocks: language label + copy button ---------------------- */
+  function decorateCodeBlocks() {
     var blocks = document.querySelectorAll("[data-prose] pre");
     blocks.forEach(function (pre) {
-      pre.style.position = "relative";
+      pre.classList.add("code-block");
+
+      // derive language from a `language-xxx` class on <pre> or <code>
+      var code = pre.querySelector("code");
+      var cls = (pre.className + " " + (code ? code.className : "")).split(/\s+/);
+      var lang = "";
+      cls.forEach(function (c) {
+        var m = c.match(/^language-(.+)$/);
+        if (m) lang = m[1];
+      });
+      if (lang) {
+        var tag = document.createElement("span");
+        tag.className = "code-block__lang";
+        tag.textContent = lang;
+        pre.appendChild(tag);
+      }
+
       var btn = document.createElement("button");
-      btn.className = "btn--ghost";
+      btn.className = "code-block__copy";
+      btn.type = "button";
       btn.textContent = "复制";
-      btn.style.cssText =
-        "position:absolute;top:8px;right:8px;padding:2px 8px;font-size:12px;opacity:0;transition:opacity .12s";
-      pre.addEventListener("mouseenter", function () { btn.style.opacity = "1"; });
-      pre.addEventListener("mouseleave", function () { btn.style.opacity = "0"; });
       btn.addEventListener("click", function () {
-        var code = pre.querySelector("code");
         navigator.clipboard.writeText(code ? code.innerText : pre.innerText).then(function () {
           btn.textContent = "已复制";
-          setTimeout(function () { btn.textContent = "复制"; }, 1500);
+          btn.classList.add("is-done");
+          setTimeout(function () {
+            btn.textContent = "复制";
+            btn.classList.remove("is-done");
+          }, 1500);
         });
       });
       pre.appendChild(btn);
+    });
+  }
+
+  /* ---- accurate reading time (count words from rendered text) ---------- */
+  function refineReadingTime() {
+    var el = document.querySelector("[data-reading-time]");
+    var body = document.querySelector("[data-prose]");
+    if (!el || !body) return;
+    var text = body.innerText || body.textContent || "";
+    var cjk = (text.match(/[一-龥぀-ヿ]/g) || []).length;
+    var words = (text.replace(/[一-龥぀-ヿ]/g, " ")
+      .match(/[A-Za-z0-9]+/g) || []).length;
+    // ~400 CJK chars/min, ~200 western words/min
+    var mins = Math.max(1, Math.round(cjk / 400 + words / 200));
+    el.textContent = mins + " 分钟阅读";
+  }
+
+  /* ---- share: copy link ----------------------------------------------- */
+  function bindShareCopy() {
+    var CHECK =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"' +
+      ' stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M20 6 9 17l-5-5"/></svg>';
+    document.querySelectorAll("[data-share-copy]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var url = btn.getAttribute("data-url");
+        if (!url || url.indexOf("http") !== 0) url = window.location.href;
+        navigator.clipboard.writeText(url).then(function () {
+          if (btn.dataset.busy) return;
+          btn.dataset.busy = "1";
+          var original = btn.innerHTML;
+          btn.innerHTML = CHECK;
+          btn.classList.add("is-done");
+          setTimeout(function () {
+            btn.innerHTML = original;
+            btn.classList.remove("is-done");
+            delete btn.dataset.busy;
+          }, 1500);
+        });
+      });
+    });
+  }
+
+  /* ---- back to top ----------------------------------------------------- */
+  function bindBackToTop() {
+    var btn = document.createElement("button");
+    btn.className = "back-to-top";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "返回顶部");
+    btn.innerHTML = "↑";
+    document.body.appendChild(btn);
+
+    function onScroll() {
+      btn.classList.toggle("is-visible", window.scrollY > 600);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  /* ---- image lightbox -------------------------------------------------- */
+  function bindLightbox() {
+    var imgs = document.querySelectorAll("[data-prose] img");
+    if (!imgs.length) return;
+
+    var overlay = document.createElement("div");
+    overlay.className = "lightbox";
+    var big = document.createElement("img");
+    overlay.appendChild(big);
+    document.body.appendChild(overlay);
+
+    function close() { overlay.classList.remove("is-open"); }
+    overlay.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") close();
+    });
+
+    imgs.forEach(function (img) {
+      img.classList.add("zoomable");
+      img.addEventListener("click", function () {
+        big.src = img.currentSrc || img.src;
+        big.alt = img.alt || "";
+        overlay.classList.add("is-open");
+      });
     });
   }
 
@@ -211,6 +314,10 @@
     bindAdminEntry();
     buildToc();
     bindToc();
-    bindCodeCopy();
+    decorateCodeBlocks();
+    refineReadingTime();
+    bindShareCopy();
+    bindBackToTop();
+    bindLightbox();
   });
 })();

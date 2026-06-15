@@ -58,6 +58,15 @@ spec:
           label: 站点 Emoji 图标
           value: "📝"
           help: 没有头像 / Logo 时作为占位，并显示在移动端顶栏站点名前。
+        - $formkit: textarea
+          name: epigraph
+          label: 侧栏题记
+          value: "巧者劳而知者忧，无能者无所求，饱食而遨游，泛若不系之舟，虚而遨游者也。"
+          help: 显示在侧栏站点名下方的引文 / 站点格言，可留空。支持 <br> 换行。
+        - $formkit: text
+          name: epigraph_source
+          label: 题记出处
+          value: "《庄子·列御寇》"
         - $formkit: code
           name: nav_extra
           label: 额外导航链接（HTML）
@@ -87,6 +96,20 @@ spec:
           label: 启用评论
           value: true
           help: 需安装「评论组件」插件后生效。
+        - $formkit: checkbox
+          name: show_related
+          label: 文章底部显示「相关文章」
+          value: true
+          help: 取同分类下的其他文章，最多 3 篇。
+        - $formkit: checkbox
+          name: show_copyright
+          label: 文章底部显示版权声明
+          value: true
+        - $formkit: text
+          name: copyright_notice
+          label: 版权声明文字
+          value: "本文采用 CC BY-NC-SA 4.0 许可协议，转载请注明出处。"
+          help: 显示在文章正文末尾的版权 / 协议说明。
     - group: footer
       label: 页脚
       formSchema:
