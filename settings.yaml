@@ -46,6 +46,15 @@ spec:
               value: "normal"
             - label: 宽（≤1450px）
               value: "wide"
+        - $formkit: select
+          name: index_layout
+          label: 首页文章列表布局
+          value: "list"
+          options:
+            - label: 单列卡片列表（默认）
+              value: "list"
+            - label: 双列/三列画廊网格（Gallery）
+              value: "gallery"
     - group: header
       label: 侧栏与导航
       formSchema:

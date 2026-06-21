@@ -56,29 +56,46 @@
     });
   }
 
-  /* ---- sidebar drawer (small screens) --------------------------------- */
+  /* ---- sidebar drawer (small screens) & desktop collapse -------------- */
   function bindSidebarToggle() {
     var toggle = document.querySelector("[data-sidebar-toggle]");
     var sidebar = document.querySelector("[data-sidebar]");
     var mask = document.querySelector("[data-sidebar-mask]");
+    var collapse = document.querySelector("[data-sidebar-collapse]");
     if (!toggle || !sidebar) return;
 
-    function open() {
+    function openMobile() {
       sidebar.classList.add("is-open");
       if (mask) mask.classList.add("is-open");
     }
-    function close() {
+    function closeMobile() {
       sidebar.classList.remove("is-open");
       if (mask) mask.classList.remove("is-open");
     }
 
     toggle.addEventListener("click", function (e) {
       e.stopPropagation();
-      sidebar.classList.contains("is-open") ? close() : open();
+      if (window.innerWidth >= 850) {
+        root.removeAttribute("data-sidebar-collapsed");
+        localStorage.setItem("notion-halo-sidebar-collapsed", "0");
+      } else {
+        sidebar.classList.contains("is-open") ? closeMobile() : openMobile();
+      }
     });
-    if (mask) mask.addEventListener("click", close);
+
+    if (collapse) {
+      collapse.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (window.innerWidth >= 850) {
+          root.setAttribute("data-sidebar-collapsed", "1");
+          localStorage.setItem("notion-halo-sidebar-collapsed", "1");
+        }
+      });
+    }
+
+    if (mask) mask.addEventListener("click", closeMobile);
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") closeMobile();
     });
   }
 
@@ -178,6 +195,7 @@
       var a = document.createElement("a");
       a.href = "#" + h.id;
       a.textContent = h.textContent;
+      a.title = h.textContent;
       a.className = "lvl-" + h.tagName.slice(1);
       li.appendChild(a);
       list.appendChild(li);
@@ -269,7 +287,7 @@
     btn.className = "back-to-top";
     btn.type = "button";
     btn.setAttribute("aria-label", "返回顶部");
-    btn.innerHTML = "↑";
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>';
     document.body.appendChild(btn);
 
     function onScroll() {

@@ -17,7 +17,9 @@
            th:text="'共 ' + ${tag.status.postCount} + ' 篇文章'">共 0 篇文章</p>
       </div>
 
-      <div class="post-list" th:if="${posts != null and !posts.items.isEmpty()}">
+      <div class="post-list"
+           th:classappend="${(theme.config.style.index_layout ?: 'list') == 'gallery'} ? 'post-list--gallery' : 'post-list--list'"
+           th:if="${posts != null and !posts.items.isEmpty()}">
         <th:block th:each="post : ${posts.items}">
           <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
         </th:block>

@@ -10,7 +10,21 @@
 
     <main class="site-main">
       <div class="container">
-      <div class="page-head">
+      <img class="post-cover"
+           th:if="${!#strings.isEmpty(singlePage.spec.cover)}"
+           th:src="${singlePage.spec.cover}" th:alt="${singlePage.spec.title}" />
+
+      <div class="page-head"
+           th:with="pageEmoji=${singlePage.metadata.annotations != null ? (singlePage.metadata.annotations['notion-halo/emoji'] ?: singlePage.metadata.annotations['emoji']) : null}"
+           th:classappend="${!#strings.isEmpty(singlePage.spec.cover)} ? 'has-cover'">
+        <span class="page-head__emoji page-head__emoji--overlap"
+              th:if="${!#strings.isEmpty(pageEmoji)}"
+              th:text="${pageEmoji}">📝</span>
+        <div class="breadcrumbs">
+          <a href="/">🏠 首页</a>
+          <span class="breadcrumbs__separator">/</span>
+          <span class="breadcrumbs__current" th:text="${singlePage.spec.title}">当前页面</span>
+        </div>
         <h1 class="page-title" th:text="${singlePage.spec.title}">页面标题</h1>
         <div class="meta" th:if="${singlePage.spec.publishTime != null}" style="margin-top:12px">
           <span class="meta__item"

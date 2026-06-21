@@ -18,10 +18,12 @@
 
       <!--/* On the first page, split pinned posts into a featured row. */-->
       <th:block th:if="${posts != null and !posts.items.isEmpty() and !posts.hasPrevious}"
-                th:with="pinned=${posts.items.?[spec.pinned]}">
+                th:with="pinned=${posts.items.?[spec.pinned]},
+                         layout=${theme.config.style.index_layout ?: 'list'}">
         <section class="featured" th:if="${pinned != null and !pinned.isEmpty()}">
           <p class="section-label">置顶推荐</p>
-          <div class="post-list">
+          <div class="post-list"
+               th:classappend="${layout == 'gallery'} ? 'post-list--gallery' : 'post-list--list'">
             <th:block th:each="post : ${pinned}">
               <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
             </th:block>
@@ -30,10 +32,13 @@
       </th:block>
 
       <th:block th:with="latest=${posts == null ? null
-                          : (!posts.hasPrevious ? posts.items.?[!spec.pinned] : posts.items)}">
+                          : (!posts.hasPrevious ? posts.items.?[!spec.pinned] : posts.items)},
+                         layout=${theme.config.style.index_layout ?: 'list'}">
         <p class="section-label" th:if="${latest != null and !latest.isEmpty()}">最新文章</p>
 
-        <div class="post-list" th:if="${latest != null and !latest.isEmpty()}">
+        <div class="post-list"
+             th:classappend="${layout == 'gallery'} ? 'post-list--gallery' : 'post-list--list'"
+             th:if="${latest != null and !latest.isEmpty()}">
           <th:block th:each="post : ${latest}">
             <th:block th:replace="~{fragments/post-card :: card(${post})}"></th:block>
           </th:block>

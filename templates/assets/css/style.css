@@ -80,6 +80,29 @@ html[data-theme="dark"] {
   --card-shadow: rgba(0, 0, 0, 0.35) 0 8px 20px;
   color-scheme: dark;
 }
+html[data-theme="dark"] .post-card:hover {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5),
+              0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+/* =========================================================================
+   Notion-style Scrollbar
+   ========================================================================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
 
 /* -------------------------------------------------------------------------
    Reset & base
@@ -364,6 +387,17 @@ html[data-theme="dark"] .icon-moon {
 .site-main {
   flex: 1;
   padding-block: 40px 64px;
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .container {
   width: 100%;
@@ -422,7 +456,9 @@ html[data-theme="dark"] .icon-moon {
   border-radius: var(--radius-lg);
   background: var(--bg);
   overflow: hidden;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+  transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* accent bar that slides in on hover */
 .post-card::before {
@@ -442,8 +478,9 @@ html[data-theme="dark"] .icon-moon {
 }
 .post-card:hover {
   border-color: var(--border-strong);
-  box-shadow: var(--card-shadow);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(15, 15, 15, 0.08),
+              0 1px 3px rgba(15, 15, 15, 0.02);
+  transform: translateY(-4px);
 }
 .post-card__title a {
   transition: color 0.12s ease;
@@ -765,10 +802,12 @@ html[data-theme="dark"] .icon-moon {
 .prose li { margin: 0.2em 0; }
 .prose li::marker { color: var(--text-tertiary); }
 .prose blockquote {
-  margin: 1em 0;
-  padding: 2px 0 2px 16px;
-  border-left: 3px solid var(--text);
-  color: var(--text);
+  margin: 1.5em 0;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-secondary);
 }
 .prose blockquote p { margin: 0.2em 0; }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
@@ -1151,12 +1190,11 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   position: fixed;
   right: clamp(16px, 4vw, 32px);
   bottom: clamp(16px, 4vw, 32px);
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   color: var(--text-secondary);
   background: var(--bg-elevated);
   border: 1px solid var(--border);
@@ -1165,8 +1203,11 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   opacity: 0;
   visibility: hidden;
   transform: translateY(8px);
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease,
-    color 0.12s ease, background 0.12s ease;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.12s ease,
+              background 0.12s ease;
   z-index: 40;
 }
 .back-to-top.is-visible {
@@ -1174,7 +1215,19 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   visibility: visible;
   transform: translateY(0);
 }
-.back-to-top:hover { color: var(--text); background: var(--hover); }
+.back-to-top:hover {
+  color: var(--accent);
+  background: var(--bg-secondary);
+  transform: scale(1.08) translateY(-2px);
+}
+.back-to-top svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+.back-to-top:hover svg {
+  transform: translateY(-2px);
+}
 
 /* =========================================================================
    Image lightbox
@@ -1223,6 +1276,17 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   .topbar__brand {
     display: none; /* brand lives in the sidebar now */
   }
+
+  /* Desktop Sidebar Collapsed state overrides */
+  html[data-sidebar-collapsed="1"] .sidebar {
+    transform: translateX(-100%);
+  }
+  html[data-sidebar-collapsed="1"] .main-wrapper {
+    margin-left: 0;
+  }
+  html[data-sidebar-collapsed="1"] .topbar__menu-btn {
+    display: inline-flex;
+  }
 }
 
 /* ≥ xl: reveal the floating outline (only when the article actually has a TOC).
@@ -1238,6 +1302,222 @@ body[data-font="serif"] .prose { font-family: var(--font-serif); }
   :root {
     --sidebar-width: 300px;
   }
+}
+
+/* =========================================================================
+   Notion Page Icon (Emoji) & Overlap Cover
+   ========================================================================= */
+.page-head__emoji--overlap {
+  display: inline-block;
+  font-size: 78px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.page-head.has-cover {
+  position: relative;
+}
+.page-head.has-cover .page-head__emoji--overlap {
+  margin-top: -64px;
+  background: var(--bg);
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(15, 15, 15, 0.05);
+}
+
+/* =========================================================================
+   Notion-style Blocks inside prose
+   ========================================================================= */
+/* Callout block */
+.prose .callout {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin: 1.2em 0;
+}
+.prose .callout-emoji {
+  font-size: 20px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.prose .callout-content {
+  margin: 0;
+  font-size: 14.5px;
+}
+.prose .callout-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Toggle List (details/summary) */
+.prose details {
+  margin: 0.8em 0;
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: background 0.15s ease;
+}
+.prose details[open] {
+  background: var(--bg);
+}
+.prose summary {
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding: 4px 0;
+  user-select: none;
+}
+.prose summary::-webkit-details-marker {
+  color: var(--text-tertiary);
+}
+.prose details > :not(summary) {
+  margin-top: 8px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+}
+
+/* Task List (Todo List) */
+.prose ul.task-list {
+  list-style: none;
+  padding-left: 0;
+}
+.prose li.task-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0.4em 0;
+}
+.prose li.task-list-item input[type="checkbox"] {
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+.prose li.task-list-item:has(input[type="checkbox"]:checked) {
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}
+
+/* =========================================================================
+   Dark Mode Image Adjustment
+   ========================================================================= */
+html[data-theme="dark"] .prose img {
+  filter: brightness(0.85);
+  transition: filter 0.2s ease;
+}
+html[data-theme="dark"] .prose img:hover {
+  filter: brightness(1);
+}
+
+/* =========================================================================
+   Breadcrumbs Navigation
+   ========================================================================= */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+.breadcrumbs a {
+  color: var(--text-secondary);
+  transition: color 0.12s ease;
+}
+.breadcrumbs a:hover {
+  color: var(--accent);
+}
+.breadcrumbs__separator {
+  color: var(--text-tertiary);
+  user-select: none;
+}
+.breadcrumbs__current {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* =========================================================================
+   Sidebar Collapse Button
+   ========================================================================= */
+.sidebar__collapse-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.12s ease, color 0.12s ease;
+  z-index: 10;
+}
+.sidebar:hover .sidebar__collapse-btn {
+  opacity: 1;
+}
+.sidebar__collapse-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+@media (max-width: 849px) {
+  .sidebar__collapse-btn {
+    display: none !important;
+  }
+}
+
+/* =========================================================================
+   Notion-style Blocks inside prose (Color Variations)
+   ========================================================================= */
+.prose .callout--gray { background: var(--c-gray); border-color: rgba(120, 119, 116, 0.3); }
+.prose .callout--brown { background: var(--c-brown); border-color: rgba(159, 107, 83, 0.3); }
+.prose .callout--orange { background: var(--c-orange); border-color: rgba(217, 115, 13, 0.3); }
+.prose .callout--yellow { background: var(--c-yellow); border-color: rgba(203, 145, 47, 0.3); }
+.prose .callout--green { background: var(--c-green); border-color: rgba(68, 131, 97, 0.3); }
+.prose .callout--blue { background: var(--c-blue); border-color: rgba(51, 126, 169, 0.3); }
+.prose .callout--purple { background: var(--c-purple); border-color: rgba(144, 101, 176, 0.3); }
+.prose .callout--pink { background: var(--c-pink); border-color: rgba(193, 76, 138, 0.3); }
+.prose .callout--red { background: var(--c-red); border-color: rgba(212, 76, 71, 0.3); }
+
+/* =========================================================================
+   Gallery (Grid) Layout
+   ========================================================================= */
+.post-list--gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 20px;
+}
+.post-list--gallery .post-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0;
+  padding: 0;
+}
+.post-list--gallery .post-card__cover {
+  width: 100%;
+  height: 190px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  align-self: stretch;
+}
+.post-list--gallery .post-card__body {
+  flex: 1;
+  padding: 20px 24px 24px;
+}
+.post-list--gallery .post-card:hover .post-card__cover {
+  transform: scale(1.02);
 }
 
 /* small screens */

@@ -25,7 +25,21 @@
            th:src="${post.spec.cover}" th:alt="${post.spec.title}" />
 
       <!-- title block -->
-      <div class="page-head">
+      <div class="page-head"
+           th:with="postEmoji=${post.metadata.annotations != null ? (post.metadata.annotations['notion-halo/emoji'] ?: post.metadata.annotations['emoji']) : null}"
+           th:classappend="${!#strings.isEmpty(post.spec.cover)} ? 'has-cover'">
+        <span class="page-head__emoji page-head__emoji--overlap"
+              th:if="${!#strings.isEmpty(postEmoji)}"
+              th:text="${postEmoji}">📝</span>
+        <div class="breadcrumbs">
+          <a href="/">🏠 首页</a>
+          <span class="breadcrumbs__separator">/</span>
+          <th:block th:if="${post.categories != null and !post.categories.isEmpty()}">
+            <a th:href="${post.categories[0].status.permalink}" th:text="${post.categories[0].spec.displayName}">分类</a>
+            <span class="breadcrumbs__separator">/</span>
+          </th:block>
+          <span class="breadcrumbs__current" th:text="${post.spec.title}">当前文章</span>
+        </div>
         <h1 class="page-title" th:text="${post.spec.title}">文章标题</h1>
 
         <div class="meta" th:if="${theme.config.post.show_meta}" style="margin-top:14px">
